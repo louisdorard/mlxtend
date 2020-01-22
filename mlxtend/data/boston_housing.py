@@ -6,11 +6,18 @@
 #
 # License: BSD 3 clause
 
-import numpy as np
-import os
+# TODO: add 2nd author
 
-this_dir, this_filename = os.path.split(__file__)
-DATA_PATH = os.path.join(this_dir, "data", "boston_housing.csv")
+from dotenv import load_dotenv
+from mlxtend.utils.data import df2Xy
+import numpy as np
+from os import getenv
+from pandas import read_csv
+from sklearn.model_selection import train_test_split
+
+load_dotenv()
+DATA_PATH = getenv("DATA_PATH")
+print("Using data in " + DATA_PATH)
 
 
 def boston_housing_data():
@@ -53,6 +60,5 @@ def boston_housing_data():
     http://rasbt.github.io/mlxtend/user_guide/data/boston_housing_data/
 
     """
-    tmp = np.genfromtxt(fname=DATA_PATH, delimiter=',', dtype=float)
-    X, y = tmp[:, :-1], tmp[:, -1]
-    return X, y
+    data = read_csv(DATA_PATH + "boston-housing.csv", index_col=0)
+    return df2Xy(data, 'medv')
