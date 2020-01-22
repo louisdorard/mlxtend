@@ -19,6 +19,10 @@ load_dotenv()
 DATA_PATH = getenv("DATA_PATH")
 print("Using data in " + DATA_PATH)
 
+def split_boston_housing_data(test_size=0.2, seed=42):
+    # TODO: add comments
+    X, y = boston_housing_data()
+    return train_test_split(X, y, test_size=test_size, random_state=seed)
 
 def boston_housing_data():
     """Boston Housing dataset.
