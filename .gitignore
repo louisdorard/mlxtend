@@ -44,3 +44,5 @@ doc/_build
 *ENV
 .DS_store
 .idea
+
+.vscode/
