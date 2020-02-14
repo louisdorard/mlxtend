@@ -8,21 +8,9 @@
 
 # TODO: add 2nd author
 
-from dotenv import load_dotenv
-from mlxtend.utils.data import df2Xy
-import numpy as np
-from os import getenv
+from mlxtend.utils.data import df2Xy, filename2path
 from pandas import read_csv
 from sklearn.model_selection import train_test_split
-
-load_dotenv()
-DATA_PATH = getenv("DATA_PATH")
-print("Using data in " + DATA_PATH)
-
-def split_boston_housing_data(test_size=0.2, seed=42):
-    # TODO: add comments
-    X, y = boston_housing_data()
-    return train_test_split(X, y, test_size=test_size, random_state=seed)
 
 def boston_housing_data():
     """Boston Housing dataset.
@@ -64,5 +52,10 @@ def boston_housing_data():
     http://rasbt.github.io/mlxtend/user_guide/data/boston_housing_data/
 
     """
-    data = read_csv(DATA_PATH + "boston-housing.csv", index_col=0)
+    data = read_csv(filename2path("boston-housing.csv"), index_col=0)
     return df2Xy(data, 'medv')
+
+def split_boston_housing_data(test_size=0.2, seed=42):
+    # TODO: add comments
+    X, y = boston_housing_data()
+    return train_test_split(X, y, test_size=test_size, random_state=seed)
