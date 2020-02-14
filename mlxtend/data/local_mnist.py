@@ -8,7 +8,15 @@
 
 import struct
 import numpy as np
+from mlxtend.utils.data import filename2path
 
+def load_train_test_mnist():
+    X_train, y_train = loadlocal_mnist(
+        images_path=filename2path("MNIST/train-images-idx3-ubyte"), labels_path=filename2path("MNIST/train-labels-idx3-ubyte"))
+    X_test, y_test = loadlocal_mnist(
+        images_path=filename2path("MNIST/t10k-images-idx3-ubyte"),
+        labels_path=filename2path("MNIST/t10k-labels-idx3-ubyte"))
+    return X_train, X_test, y_train, y_test
 
 def loadlocal_mnist(images_path, labels_path):
     """ Read MNIST from ubyte files.
