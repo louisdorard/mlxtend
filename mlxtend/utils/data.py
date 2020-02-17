@@ -2,6 +2,7 @@
 
 from sklearn.model_selection import train_test_split
 from os import getenv
+from pandas import read_csv
 from dotenv import find_dotenv, load_dotenv
 from pathlib import Path
 
@@ -74,9 +75,17 @@ def filename2path(projectname="", filename="train_full.csv"):
         path = _path_from_envfile(projectname + "/" + filename)
         if path=="":
             print("Couldn't find '" + filename + "' in a subdirectory of DATA_PATH dedicated to project '" + projectname + "'... Now looking in DATA_PATH directly...")
-    path = _path_from_envvar(filename)
-    if path=="":
-        path = _path_from_envfile(filename)
-        if path=="":
-            print("Couldn't find " + filename)
+            path = _path_from_envvar(filename)
+            if path=="":
+                path = _path_from_envfile(filename)
+                if path=="":
+                    print("Couldn't find " + filename)
     return path
+
+def load(projectname="", filename="train_full.csv", target_column=""):
+    data = read_csv(filename2path(projectname, filename), index_col=0)
+    return df2Xy(data, target_column)
+
+def load_split(projectname="", filename="train_full.csv", target_column="", test_size=0.2, seed=42):
+    X, y = load(projectname, filename, target_column)
+    return train_test_split(X, y, test_size=test_size, random_state=seed)
