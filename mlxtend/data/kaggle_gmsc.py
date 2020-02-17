@@ -5,7 +5,7 @@ from pandas import read_csv
 from sklearn.model_selection import train_test_split
 
 def kaggle_gmsc_data_nomissing():
-    data = read_csv(filename2path("kaggle-give-me-credit.csv"), index_col=0)
+    data = read_csv(filename2path("give-me-some-credit"), index_col=0)
     data.dropna(inplace=True)
     return df2Xy(data, 'SeriousDlqin2yrs')
 
