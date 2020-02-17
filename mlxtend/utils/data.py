@@ -64,7 +64,16 @@ def _path_from_envfile(filename):
             trainfull_path = TRAINFULL_PATH_ENVFILE
     return trainfull_path
 
-def filename2path(filename):
+def filename2path(projectname="", filename="train_full.csv"):
+    # try to find filename in subdirectory of DATA_PATH whose name is projectname, via the env var or an env file
+    # if it can't be found there, try to find filename in DATA_PATH directly
+    # another implementation could be to have _path_from_envvar and _path_from_envfile look in these two possible locations, instead of filename2path
+    if (projectname==""): print("Project name is empty")
+    path = _path_from_envvar(projectname + "/" + filename)
+    if path=="":
+        path = _path_from_envfile(projectname + "/" + filename)
+        if path=="":
+            print("Couldn't find '" + filename + "' in a subdirectory of DATA_PATH dedicated to project '" + projectname + "'... Now looking in DATA_PATH directly...")
     path = _path_from_envvar(filename)
     if path=="":
         path = _path_from_envfile(filename)
