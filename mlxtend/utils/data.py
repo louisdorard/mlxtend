@@ -41,7 +41,7 @@ def _path_from_envvar(filename):
         print("  Not found")
     else:
         print(" Found it!")
-        TRAINFULL_PATH_ENVVAR = DATA_PATH_ENVVAR + filename
+        TRAINFULL_PATH_ENVVAR = DATA_PATH_ENVVAR + "/" + filename
         print("Looking for file at " + TRAINFULL_PATH_ENVVAR + " ...")
         if Path(TRAINFULL_PATH_ENVVAR).expanduser().exists():
             print("  Found it!")
@@ -57,7 +57,7 @@ def _path_from_envfile(filename):
         print("  Found it!")
         load_dotenv()
         DATA_PATH_ENVFILE = getenv("DATA_PATH")
-        TRAINFULL_PATH_ENVFILE = DATA_PATH_ENVFILE + filename
+        TRAINFULL_PATH_ENVFILE = DATA_PATH_ENVFILE + "/" + filename
         print("Looking for file at " + TRAINFULL_PATH_ENVFILE + " ...")
         if Path(TRAINFULL_PATH_ENVFILE).expanduser().exists():
             print("  Found it!")
