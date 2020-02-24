@@ -99,21 +99,26 @@ class Orchestrator():
             print("Model wasn't saved at " + model_path + " as expected!")
 
     def validate(self, model_name=""):
+        from mlxtend.utils.data import df2Xydf
         if (model_name==""):
             model_name = self.model_name
         val_raw = read_csv("data/val_raw.csv", index_col=0)
         val = self.featurize(val_raw)
-        val[self.target_name] = self.predict(val)
+        X_val, y_val = df2Xydf(val, self.target_name)
+        val[self.target_name] = self.predict(X_val, model_name)
         val.to_csv("data/val_pred.csv")
 
-    def submit_test_pred(self, model_name="model"):
+    def submit_test_pred(self, model_name=""):
         """
         Predict on raw test set against model and submit to Kaggle
         """
+        if (model_name==""):
+            model_name = self.model_name
         submission_file = "data/" + model_name + "-submission.csv"
         test_raw = load_data(self.project_name, "test_raw.csv")
-        submission = DataFrame()
-        submission[self.target_name] = self.predict(self.featurize(test_raw), model_name)
+        test = self.featurize(test_raw)
+        submission = test.copy()
+        submission[self.target_name] = self.predict(test, model_name)
         submission[[self.target_name]].to_csv(submission_file)
         kaggle.api.competition_submit(submission_file, model_name, self.competition_name)
         # TODO: store score as model metadata
