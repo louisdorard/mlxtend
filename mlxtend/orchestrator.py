@@ -105,7 +105,7 @@ class Orchestrator():
         val_raw = read_csv("data/val_raw.csv", index_col=0)
         val = self.featurize(val_raw)
         X_val, y_val = df2Xydf(val, self.target_name)
-        val[self.target_name] = self.predict(X_val, model_name)
+        val[self.target_name + "_pred"] = self.predict(X_val, model_name)
         val.to_csv("data/val_pred.csv")
 
     def submit_test_pred(self, model_name=""):
