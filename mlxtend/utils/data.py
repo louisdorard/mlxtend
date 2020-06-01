@@ -112,8 +112,43 @@ def filename2path(projectname, filename="train_full_raw.csv"):
 
 
 ###
-# Data loading utils
+# Data loading and saving utils
 ###
 
-def load_data(projectname, filename):
-    return read_csv(filename2path(projectname, filename), index_col=0)
+def get_data_path():
+    return Path(get_key(".env", "DATA_PATH")).resolve().expanduser()
+
+def get_file_name(project, name, version, extension):
+    if (name == ""): file_name = project + version + extension
+    else: file_name = project + "_" + name + version + extension
+    return file_name
+
+def get_file_path(project, name, version, extension):
+    return get_data_path().joinpath(get_file_name(project, name, version, extension))
+
+def get_file_path_data(project, name, version):
+    return get_file_path(project, name, version, ".csv")
+
+def get_file_path_model(project, name, version):
+    if (project == ""): name = "model"
+    return get_file_path(project, name, version, ".joblib")
+
+def load_data(project="", name="train_full", version=""):
+    file_path = get_file_path_data(project, name, version)
+    print("Loading data from " + str(file_path))
+    return read_csv(file_path, index_col=0)
+
+def save_data(df, project, name, version=""):
+    file_path = get_file_path_data(project, name, version)
+    df.to_csv(file_path)
+    print("Data saved in " + str(file_path))
+
+def load_model(project="", name="", version=""):
+    file_path = get_file_path_model(project, name, version)
+    print("Loading model from " + str(file_path))
+    return load(file_path)
+
+def save_model(model, project, name="", version=""):
+    file_path = get_file_path_model(project, name, version)
+    dump(model, file_path)
+    print("Model saved in " + str(file_path))
