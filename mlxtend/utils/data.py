@@ -5,6 +5,7 @@ from os import getenv
 from pandas import read_csv
 from dotenv import find_dotenv, load_dotenv, dotenv_values, get_key
 from pathlib import Path
+from joblib import load, dump
 
 
 ###
