@@ -17,7 +17,11 @@ def df2Xydf(df, target_column=""):
     Transform dataframe into 2 dataframes: one for inputs (X) and one for outputs (y)
     """
     if (target_column==""): target_column = df.columns[-1]
-    y = df[target_column]
+    y = df[target_column].values
+    if (len(df.columns)==2):
+        f = df.columns[0]
+        X = df[f].values
+    else:
     X = df.drop(target_column, axis=1)
     return X, y
 
@@ -26,7 +30,7 @@ def df2Xy(df, target_column=""):
     Transform dataframe into 2 arrays: one for inputs (X) and one for outputs (y)
     """
     X, y = df2Xydf(df, target_column)
-    return X.values, y.values
+    return X.values, y
 
 def df2Xy_labelencoded(df, target_column=""):
     """
