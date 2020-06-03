@@ -6,19 +6,14 @@
 #
 # License: BSD 3 clause
 
+from mlxtend.utils.data import df2Xydf
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-def plot_learning_curves(X_train, y_train,
-                         X_test, y_test,
-                         clf,
-                         train_marker='o',
-                         test_marker='^',
-                         scoring='misclassification error',
-                         suppress_plot=False, print_model=True,
-                         style='fivethirtyeight',
-                         legend_loc='best'):
+def compute_learning_curves(model,
+                        train,
+                        val,
+                        scoring='misclassification error'):
     """Plots learning curves of a classifier.
 
     Parameters
@@ -27,15 +22,15 @@ def plot_learning_curves(X_train, y_train,
         Feature matrix of the training dataset.
     y_train : array-like, shape = [n_samples]
         True class labels of the training dataset.
-    X_test : array-like, shape = [n_samples, n_features]
-        Feature matrix of the test dataset.
-    y_test : array-like, shape = [n_samples]
-        True class labels of the test dataset.
-    clf : Classifier object. Must have a .predict .fit method.
+    X_val : array-like, shape = [n_samples, n_features]
+        Feature matrix of the val dataset.
+    y_val : array-like, shape = [n_samples]
+        True class labels of the val dataset.
+    model : Classifier object. Must have a .predict .fit method.
     train_marker : str (default: 'o')
         Marker for the training set line plot.
-    test_marker : str (default: '^')
-        Marker for the test set line plot.
+    val_marker : str (default: '^')
+        Marker for the val set line plot.
     scoring : str (default: 'misclassification error')
         If not 'misclassification error', accepts the following metrics
         (from scikit-learn):
@@ -44,9 +39,6 @@ def plot_learning_curves(X_train, y_train,
         'precision', 'recall', 'roc_auc',
         'adjusted_rand_score', 'mean_absolute_error', 'mean_squared_error',
         'median_absolute_error', 'r2'}
-    suppress_plot=False : bool (default: False)
-        Suppress matplotlib plots if True. Recommended
-        for testing purposes.
     print_model : bool (default: True)
         Print model parameters in plot title if True.
     style : str (default: 'fivethirtyeight')
@@ -57,7 +49,7 @@ def plot_learning_curves(X_train, y_train,
 
     Returns
     ---------
-    errors : (training_error, test_error): tuple of lists
+    errors : (training_error, val_error): tuple of lists
 
     Examples
     -----------
@@ -65,8 +57,12 @@ def plot_learning_curves(X_train, y_train,
     http://rasbt.github.io/mlxtend/user_guide/plotting/plot_learning_curves/
 
     """
+    X_train, y_train = df2Xydf(train)
+    X_val, y_val = df2Xydf(val)
+
     if scoring != 'misclassification error':
         from sklearn import metrics
+        from mlxtend.evaluate.mape import mape
 
         scoring_func = {
             'accuracy': metrics.accuracy_score,
@@ -84,6 +80,7 @@ def plot_learning_curves(X_train, y_train,
             'mean_absolute_error': metrics.mean_absolute_error,
             'mean_squared_error': metrics.mean_squared_error,
             'median_absolute_error': metrics.median_absolute_error,
+            'mape': mape,
             'r2': metrics.r2_score}
 
         if scoring not in scoring_func.keys():
@@ -96,39 +93,46 @@ def plot_learning_curves(X_train, y_train,
         scoring_func = {
             'misclassification error': misclf_err}
 
-    training_errors = []
-    test_errors = []
+    train_errors = []
+    val_errors = []
 
     rng = [int(i) for i in np.linspace(0, X_train.shape[0], 11)][1:]
     for r in rng:
-        model = clf.fit(X_train[:r], y_train[:r])
+        model.fit(X_train[:r], y_train[:r])
 
-        y_train_predict = clf.predict(X_train[:r])
-        y_test_predict = clf.predict(X_test)
+        y_train_predict = model.predict(X_train[:r])
+        y_val_predict = model.predict(X_val)
 
         train_misclf = scoring_func[scoring](y_train[:r], y_train_predict)
-        training_errors.append(train_misclf)
+        train_errors.append(train_misclf)
 
-        test_misclf = scoring_func[scoring](y_test, y_test_predict)
-        test_errors.append(test_misclf)
+        val_misclf = scoring_func[scoring](y_val, y_val_predict)
+        val_errors.append(val_misclf)
+    
+    from pandas import DataFrame
+    performance = DataFrame()
+    performance["train"] = train_errors
+    performance["val"] = val_errors
 
-    if not suppress_plot:
-        with plt.style.context(style):
-            plt.plot(np.arange(10, 101, 10), training_errors,
-                     label='training set', marker=train_marker)
-            plt.plot(np.arange(10, 101, 10), test_errors,
-                     label='test set', marker=test_marker)
-            plt.xlabel('Training set size in percent')
+    return performance
 
-    if not suppress_plot:
-        with plt.style.context(style):
-            plt.ylabel('Performance ({})'.format(scoring))
-            if print_model:
-                plt.title('Learning Curves\n\n{}\n'.format(model))
-            plt.legend(loc=legend_loc, numpoints=1)
-            plt.xlim([0, 110])
-            max_y = max(max(test_errors), max(training_errors))
-            min_y = min(min(test_errors), min(training_errors))
-            plt.ylim([min_y - min_y * 0.15, max_y + max_y * 0.15])
-    errors = (training_errors, test_errors)
-    return errors
+
+def plot_learning_curves(performance, scoring='misclassification error',
+                         train_marker='o',
+                         val_marker='^',
+                         legend_loc='best'):
+
+    plt.plot(np.arange(10, 101, 10), performance["train"].values,
+                label='training set', marker=train_marker)
+    plt.plot(np.arange(10, 101, 10), performance["val"].values,
+                label='val set', marker=val_marker)
+    plt.xlabel('Training set size in percent')
+
+    plt.ylabel('Performance ({})'.format(scoring))
+    plt.legend(loc=legend_loc, numpoints=1)
+    plt.xlim([0, 110])
+    max_y = max(max(performance["val"].values), max(performance["train"].values))
+    min_y = min(min(performance["val"].values), min(performance["train"].values))
+    plt.ylim([min_y - min_y * 0.15, max_y + max_y * 0.15])
+    
+    plt.show()
