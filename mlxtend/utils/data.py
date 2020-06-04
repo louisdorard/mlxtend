@@ -1,4 +1,5 @@
-# TODO: add comments here and docstring in functions below
+# Author: Louis Dorard <louisdorard.com>
+# TODO: add comments here and docstrings in functions below
 
 from sklearn.model_selection import train_test_split
 from os import getenv
