@@ -126,12 +126,14 @@ def get_data_path():
     return Path(get_key(dotenv_path, "DATA_PATH")).resolve().expanduser()
 
 def get_file_name(project, name, version, extension):
-    if (name == ""): file_name = project + version + extension
-    else: 
-        file_name = project + "_" + name
-        if ~(version == ""):
-            file_name += "_" + version
-        file_name += extension
+    if (project != ""):
+        if (name != ""): file_name = project + "_" + name
+        else: file_name = project
+    else:
+        file_name = name
+    if (version != ""):
+        file_name += "_" + version
+    file_name += extension
     return file_name
 
 def get_file_path(project, name, version, extension):
