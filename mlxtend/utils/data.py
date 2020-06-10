@@ -23,7 +23,7 @@ def df2Xydf(df, target_column=""):
         f = df.columns[0]
         X = df[f].values
     else:
-    X = df.drop(target_column, axis=1)
+        X = df.drop(target_column, axis=1)
     return X, y
 
 def df2Xy(df, target_column=""):
@@ -122,11 +122,16 @@ def filename2path(projectname, filename="train_full_raw.csv"):
 ###
 
 def get_data_path():
-    return Path(get_key(".env", "DATA_PATH")).resolve().expanduser()
+    dotenv_path = find_dotenv(usecwd=True)
+    return Path(get_key(dotenv_path, "DATA_PATH")).resolve().expanduser()
 
 def get_file_name(project, name, version, extension):
     if (name == ""): file_name = project + version + extension
-    else: file_name = project + "_" + name + version + extension
+    else: 
+        file_name = project + "_" + name
+        if ~(version == ""):
+            file_name += "_" + version
+        file_name += extension
     return file_name
 
 def get_file_path(project, name, version, extension):
@@ -137,9 +142,9 @@ def get_file_path_data(project, name, version):
 
 def get_file_path_model(project, name, version):
     if (project == ""): name = "model"
-    return get_file_path(project, name, version, ".joblib")
+    return get_file_path(project, name, version, ".pkl")
 
-def load_data(project="", name="train_full", version=""):
+def load_data(project="", name="train_full_raw", version=""):
     file_path = get_file_path_data(project, name, version)
     print("Loading data from " + str(file_path))
     return read_csv(file_path, index_col=0)
@@ -149,12 +154,14 @@ def save_data(df, project, name, version=""):
     df.to_csv(file_path)
     print("Data saved in " + str(file_path))
 
-def load_model(project="", name="", version=""):
-    file_path = get_file_path_model(project, name, version)
+def load_model(project="", name="", version="", path=None):
+    if path: file_path = path
+    else: file_path = get_file_path_model(project, name, version)
     print("Loading model from " + str(file_path))
     return load(file_path)
 
-def save_model(model, project, name="", version=""):
-    file_path = get_file_path_model(project, name, version)
+def save_model(model, project="", name="", version="", path=None):
+    if path: file_path = path
+    else: file_path = get_file_path_model(project, name, version)
     dump(model, file_path)
     print("Model saved in " + str(file_path))
