@@ -151,7 +151,7 @@ def load_data(project="", name="train_full_raw", version=""):
     print("Loading data from " + str(file_path))
     return read_csv(file_path, index_col=0)
 
-def save_data(df, project, name, version=""):
+def save_data(df, project="", name="temp.csv", version=""):
     file_path = get_file_path_data(project, name, version)
     df.to_csv(file_path)
     print("Data saved in " + str(file_path))
