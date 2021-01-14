@@ -136,14 +136,13 @@ def get_file_name(project, name, version, extension):
     file_name += extension
     return file_name
 
-def get_file_path(project, name, version, extension):
+def get_file_path(project="", name="train_full_raw", version="", extension=""):
     return get_data_path().joinpath(get_file_name(project, name, version, extension))
 
-def get_file_path_data(project, name, version):
+def get_file_path_data(project="", name="train_full_raw", version=""):
     return get_file_path(project, name, version, ".csv")
 
-def get_file_path_model(project, name, version):
-    if (project == ""): name = "model"
+def get_file_path_model(project="", name="model", version=""):
     return get_file_path(project, name, version, ".pkl")
 
 def load_data(project="", name="train_full_raw", version=""):
