@@ -155,13 +155,13 @@ def save_data(df, project="", name="temp.csv", version=""):
     df.to_csv(file_path)
     print("Data saved in " + str(file_path))
 
-def load_model(project="", name="", version="", path=None):
+def load_model(project="", name="model", version="", path=None):
     if path: file_path = path
     else: file_path = get_file_path_model(project, name, version)
     print("Loading model from " + str(file_path))
     return load(file_path)
 
-def save_model(model, project="", name="", version="", path=None):
+def save_model(model, project="", name="model", version="", path=None):
     if path: file_path = path
     else: file_path = get_file_path_model(project, name, version)
     dump(model, file_path)
